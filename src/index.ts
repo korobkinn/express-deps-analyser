@@ -1,9 +1,11 @@
-import express from 'express'
+import dotenv from 'dotenv';
+import express from 'express';
 
 import api from './api';
 
+dotenv.config();
 const app = express();
-const port = 5072;
+const port = process.env.PORT;
 
 app.use('/api/v1', api);
 app.get('/', (request, response) => {
