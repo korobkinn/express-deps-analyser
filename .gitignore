@@ -5,11 +5,10 @@ npm-debug.log
 node_modules/
 dist/
 tmp/
-.eslintcache
+/.eslintcache
 
 #################  
 ## VS
 #################
 .vs/
 .vscode/
-/.eslintcache

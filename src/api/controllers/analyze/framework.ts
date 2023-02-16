@@ -43,7 +43,12 @@ export async function analyzeFramework(req: Request, res: Response) {
             };
 
             const dree = require('dree');
-            dree.scan(path.resolve('tmp').toString(), { extensions: [ 'pbxproj' ] }, fileCb, dirCb);
+            await dree.scan(path.resolve('tmp').toString(), { extensions: [ 'pbxproj' ] }, fileCb, dirCb);
+            
+            if (!res.writableEnded)
+            {
+                res.end("Noone supported framework detected");
+            }
 
         });
     });
