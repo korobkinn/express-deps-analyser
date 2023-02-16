@@ -3,7 +3,6 @@ import { https } from 'follow-redirects';
 import fs from 'fs';
 import path from 'path';
 import extract from 'extract-zip';
-import xcode from 'xcode';
 import stream from 'node:stream/promises';
 import { Readable } from 'stream';
 
@@ -14,14 +13,14 @@ async function httpsPromisedGet(link): Promise<Readable> {
 }
 
 function findFileByExt(base, ext): string {
-    
+
     var files = fs.readdirSync(base);
     var result = "";
-    
+
     for (let i = 0; i < files.length; i++) {
-        
+
         const newbase = path.join(base, files[i]);
-        
+
         if (fs.statSync(newbase).isDirectory()) {
             result = findFileByExt(newbase, ext);
             if (result.length > 0) {
@@ -33,22 +32,21 @@ function findFileByExt(base, ext): string {
             break;
         }
     }
-    
-    return result;
 
+    return result;
 }
 
 export async function analyzeFramework(req: Request, res: Response) {
     const tempDir = path.resolve(process.env.TEMPDIRPATH);
     const tempFile = path.join(tempDir, process.env.TEMPFILENAME);
-    
+
     fs.rmSync(tempDir, { recursive: true, force: true });
     fs.mkdirSync(tempDir);
     const file = fs.createWriteStream(tempFile);
-    
-    const sourcerype = req.body['SourceType'];
+
+    const sourcetype = req.body['SourceType'];
     const link = req.body['Link'];
-    
+
     const response = await httpsPromisedGet(link);
     await stream.pipeline(response, file);
     console.log('Download Completed');
@@ -59,21 +57,23 @@ export async function analyzeFramework(req: Request, res: Response) {
     const projFile = findFileByExt(tempDir, EXTENSION);
     if (projFile.length > 0) {
 
-        const compVersion = xcode.project(projFile)
-            .parseSync().getFirstProject()
-            .firstProject.compatibilityVersion
-            .replace(/^"(.*)"$/, '$1');
+        let fileContent = fs.readFileSync(projFile, "utf8");
+        let filematch = fileContent.match("(compatibilityVersion[ =]*)\"(.*)\"");
 
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({ compatibilityVersion: compVersion }, null, 3));
+        if (filematch !== null) {
+            res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ compatibilityVersion: filematch[2] }, null, 3));
+            console.log('Found XCODE project file with compatibility information');
+        }
+        else {
+            res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ error: 'Found XCODE project file, but without compatibility information' }, null, 3));
+            console.log('Found XCODE project file, but without compatibility information');
+        }
 
-        console.log('Found');
     }
     else {
         if (!res.writableEnded) {
-            res.end('Noone supported framework detected');
-            console.log('Not found');
+            res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ error: 'Noone supported framework detected' }, null, 3));
+            console.log('Noone supported framework detected');
         }
     }
-    
 }
