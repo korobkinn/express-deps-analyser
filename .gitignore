@@ -12,3 +12,4 @@ tmp/
 #################
 .vs/
 .vscode/
+/.eslintcache
