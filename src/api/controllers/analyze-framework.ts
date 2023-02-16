@@ -14,8 +14,8 @@ async function httpsPromisedGet(link): Promise<Readable> {
 
 function findFileByExt(base, ext): string {
 
-    var files = fs.readdirSync(base);
-    var result = "";
+    const files = fs.readdirSync(base);
+    let result = '';
 
     for (let i = 0; i < files.length; i++) {
 
@@ -57,8 +57,8 @@ export async function analyzeFramework(req: Request, res: Response) {
     const projFile = findFileByExt(tempDir, EXTENSION);
     if (projFile.length > 0) {
 
-        let fileContent = fs.readFileSync(projFile, "utf8");
-        let filematch = fileContent.match("(compatibilityVersion[ =]*)\"(.*)\"");
+        const fileContent = fs.readFileSync(projFile, 'utf8');
+        const filematch = fileContent.match('(compatibilityVersion[ =]*)"(.*)"');
 
         if (filematch !== null) {
             res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ compatibilityVersion: filematch[2] }, null, 3));

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { analyzeFramework } from '../../controllers/analyze/framework';
+import { analyzeFramework } from '../controllers/analyze-framework';
 
 export const analyzeFrameworkRouter = Router();
 
