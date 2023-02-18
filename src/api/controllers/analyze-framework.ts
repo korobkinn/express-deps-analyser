@@ -8,12 +8,13 @@ import { Readable } from 'stream';
 
 async function httpsPromisedGet(link): Promise<Readable> {
     return new Promise((resolve, reject) => {
-        https.get(link, (response) => resolve(response)).on('error', reject);
+        https.get(link, (response) =>
+            resolve(response)).
+            on('error', reject);
     });
 }
 
 function findFileByExt(base, ext): string {
-
     const files = fs.readdirSync(base);
     let result = '';
 
@@ -36,44 +37,63 @@ function findFileByExt(base, ext): string {
     return result;
 }
 
+//GitHub and BitBucket provide sources as zip archive
+async function fetchSourceFromZipURL(url: string, tempdirpath: string) {
+    const response = await httpsPromisedGet(url);
+
+    let fetchedZip = path.join(tempdirpath, process.env.TEMPFILENAME);
+    const file = fs.createWriteStream(fetchedZip);
+
+    await stream.pipeline(response, file);
+    console.log('Download Completed');
+
+    await extract(fetchedZip, { dir: tempdirpath });
+    console.log('Sources extracted');
+}
+
+function parseXCode(projectFolderPath: string): string {
+    const EXTENSION = 'pbxproj';
+    const projFile = findFileByExt(projectFolderPath, EXTENSION);
+
+    if (projFile.length > 0) {
+        const fileContent = fs.readFileSync(projFile, 'utf8');
+        const filematch = fileContent.match('(compatibilityVersion[ =]*)"(.*)"');
+
+        if (filematch) {
+            console.log('Found XCODE project file with compatibility information');
+            return (JSON.stringify({ compatibilityVersion: filematch[2] }, null, 3));
+
+        }
+        else {
+            console.log('Found XCODE project file, but without compatibility information');
+            return (JSON.stringify({ warning: 'Found XCODE project file, but without compatibility information' }, null, 3));
+        }
+    }
+    else {
+        console.log('Noone supported framework detected');
+        return (JSON.stringify({ error: 'Noone supported framework detected' }, null, 3));
+    }
+}
+
 export async function analyzeFramework(req: Request, res: Response) {
     const tempDir = path.resolve(process.env.TEMPDIRPATH);
     const tempFile = path.join(tempDir, process.env.TEMPFILENAME);
 
-    fs.rmSync(tempDir, { recursive: true, force: true });
-    fs.mkdirSync(tempDir);
-    const file = fs.createWriteStream(tempFile);
+    try {
+        fs.rmSync(tempDir, { force: true, recursive: true });
+        fs.mkdirSync(tempDir);
 
-    const sourcetype = req.body['SourceType'];
-    const link = req.body['Link'];
+        const sourcetype = req.body['SourceType'];
+        const link = req.body['Link'];
 
-    const response = await httpsPromisedGet(link);
-    await stream.pipeline(response, file);
-    console.log('Download Completed');
-    await extract(tempFile, { dir: tempDir });
-    console.log('Sources extracted');
+        await fetchSourceFromZipURL(link, tempDir);
 
-    const EXTENSION = 'pbxproj';
-    const projFile = findFileByExt(tempDir, EXTENSION);
-    if (projFile.length > 0) {
-
-        const fileContent = fs.readFileSync(projFile, 'utf8');
-        const filematch = fileContent.match('(compatibilityVersion[ =]*)"(.*)"');
-
-        if (filematch !== null) {
-            res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ compatibilityVersion: filematch[2] }, null, 3));
-            console.log('Found XCODE project file with compatibility information');
-        }
-        else {
-            res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ error: 'Found XCODE project file, but without compatibility information' }, null, 3));
-            console.log('Found XCODE project file, but without compatibility information');
-        }
-
-    }
-    else {
-        if (!res.writableEnded) {
-            res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ error: 'Noone supported framework detected' }, null, 3));
-            console.log('Noone supported framework detected');
-        }
+        res.setHeader('Content-Type', 'application/json').send(parseXCode(tempDir));
+        
+    } catch (err) {
+        res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ error: err }, null, 3));
+        console.log('Error occured: ' + err);
+    } finally {
+        fs.rmSync(tempDir, { force: true, recursive: true });
     }
 }
