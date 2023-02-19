@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { json } from 'stream/consumers';
 import { IParser } from './parsers';
 
 export default class xCode implements IParser {

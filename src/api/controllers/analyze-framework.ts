@@ -11,15 +11,15 @@ export async function analyzeFramework(req: Request, res: Response) {
         fs.rmSync(tempDir, { force: true, recursive: true });
         fs.mkdirSync(tempDir);
 
-        let sourcetype = req.body['SourceType'].toLowerCase();
+        const sourcetype = req.body['SourceType'].toLowerCase();
         const link = req.body['Link'];
         switch (sourcetype) {
-            case 'github' || 'bitbucket':
-                await fetchFromZipURL(link, tempDir);
-                break;
-            default:
-                let err = new Error('No known fetchers found for given sourcetype')
-                throw (err);
+        case 'github' || 'bitbucket':
+            await fetchFromZipURL(link, tempDir);
+            break;
+        default:
+            const err = new Error('No known fetchers found for given sourcetype');
+            throw (err);
         }
 
         let parseResult: string;

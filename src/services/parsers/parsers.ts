@@ -1,4 +1,4 @@
-import xcode from './xcode'
+import xcode from './xcode';
 
 export interface IParser {
     parse(string);
@@ -12,7 +12,7 @@ export class Parser {
     }
 
     parse(projectFolderPath : string) : string {
-        return this.parser.parse(projectFolderPath)
+        return this.parser.parse(projectFolderPath);
     }
 }
 

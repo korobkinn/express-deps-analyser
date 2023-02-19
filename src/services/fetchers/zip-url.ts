@@ -17,7 +17,7 @@ async function httpsPromisedGet(link): Promise<Readable> {
 export async function fetchFromZipURL(url: string, tempdirpath: string) {
     const response = await httpsPromisedGet(url);
 
-    let fetchedZip = path.join(tempdirpath, process.env.TEMPFILENAME);
+    const fetchedZip = path.join(tempdirpath, process.env.TEMPFILENAME);
     const file = fs.createWriteStream(fetchedZip);
 
     await stream.pipeline(response, file);
