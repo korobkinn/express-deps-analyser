@@ -1,4 +1,4 @@
-import { app } from '../src/index';
+import { app, server } from '../src/index';
 import { agent as request } from 'supertest';
 import { expect } from 'chai';
 
@@ -69,3 +69,5 @@ describe('/api/v1/analyze/framework tests', () => {
         });
     });
 });
+
+server.close();

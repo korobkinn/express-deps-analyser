@@ -10,4 +10,4 @@ const port = process.env.PORT;
 app.use(bodyParser.json());
 
 app.post('/api/v1/analyze/framework', analyzeFramework);
-app.listen(port, () => console.log(`Running on port ${port}`));
+export const server = app.listen(port, () => console.log(`Running on port ${port}`));
