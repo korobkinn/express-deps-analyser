@@ -4,16 +4,15 @@ export interface IParser {
     parse(string);
 }
 
-export class Parser {
+const parsersArray : IParser[] = [ new xcode() ];
 
-    protected parser : IParser;
-    constructor(parser: IParser) {
-        this.parser = parser;
+export function parse(tempDir : string) : string {
+    let result : string;
+    for (let i = 0; i < parsersArray.length; i++) {
+        result = parsersArray[i].parse(tempDir);
+        if (!((result['error']) || (result['warning']))) {
+            break;
+        }
     }
-
-    parse(projectFolderPath : string) : string {
-        return this.parser.parse(projectFolderPath);
-    }
+    return result;
 }
-
-export const parsersArray : Parser[] = [ new Parser(new xcode) ];

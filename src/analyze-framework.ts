@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fetchFromZipURL } from './services/fetchers/zip-url';
-import { parsersArray } from './services/parsers/parsers';
+import { parse } from './services/parsers/parsers';
 
 export async function analyzeFramework(req: Request, res: Response) {
     const tempDir = path.resolve(process.env.TEMPDIRPATH);
@@ -16,14 +16,7 @@ export async function analyzeFramework(req: Request, res: Response) {
         
         await fetchSourceCode(sourcetype, link, tempDir);
         
-        let parseResult: string;
-
-        for (let i = 0; i < parsersArray.length; i++) {
-            parseResult = parsersArray[i].parse(tempDir);
-            if (!((parseResult['error']) || (parseResult['warning']))) {
-                break;
-            }
-        }
+        let parseResult = parse(tempDir);
 
         const resBody = JSON.stringify(parseResult, null, 3);
         res.statusCode = 200;
