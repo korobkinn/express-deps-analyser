@@ -13,15 +13,9 @@ export async function analyzeFramework(req: Request, res: Response) {
 
         const sourcetype = req.body['SourceType'].toLowerCase();
         const link = req.body['Link'];
-        switch (sourcetype) {
-        case 'github' || 'bitbucket':
-            await fetchFromZipURL(link, tempDir);
-            break;
-        default:
-            const err = new Error('No known fetchers found for given sourcetype');
-            throw (err);
-        }
-
+        
+        await fetchSourceCode(sourcetype, link, tempDir);
+        
         let parseResult: string;
 
         for (let i = 0; i < parsersArray.length; i++) {
@@ -31,12 +25,25 @@ export async function analyzeFramework(req: Request, res: Response) {
             }
         }
 
-        res.setHeader('Content-Type', 'application/json').send(JSON.stringify(parseResult, null, 3));
+        const resBody = JSON.stringify(parseResult, null, 3);
+        res.setHeader('Content-Type', 'application/json');
+        res.send(resBody);
 
     } catch (err) {
-        res.setHeader('Content-Type', 'application/json').send(JSON.stringify({ 'error': err.message }, null, 3));
+        const resBody = JSON.stringify({ 'error': err.message }, null, 3);
+        res.setHeader('Content-Type', 'application/json');
+        res.send(resBody);
         console.log('Error occured: ' + err);
     } finally {
         fs.rmSync(tempDir, { force: true, recursive: true });
+    }
+}
+
+async function fetchSourceCode (sourcetype: string, link : string, tempdir : string) {    
+    if ( (sourcetype === 'github') || (sourcetype === 'bitbucket') ){
+        await fetchFromZipURL(link, tempdir);
+    }
+    else{
+        throw (new Error('No known fetchers found for given sourcetype'));
     }
 }
