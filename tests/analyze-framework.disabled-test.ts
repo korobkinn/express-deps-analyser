@@ -46,7 +46,7 @@ describe('/api/v1/analyze/framework tests', () => {
                     'Link': 'https://github.com/Oleg-Karoza/ConsoleApp1/blob/main/ConsoleApp1.sl'
                 });
 
-            expect(res.status).to.equal(200);
+            expect(res.status).to.equal(500);
             expect(res.body).not.to.be.empty;
             expect(res.body).to.deep.equal({ error: 'end of central directory record signature not found' });
 
@@ -62,7 +62,7 @@ describe('/api/v1/analyze/framework tests', () => {
                     'Link': 'https://github_exabple.com/ConsoleApp1.sl'
                 });
 
-            expect(res.status).to.equal(200);
+            expect(res.status).to.equal(500);
             expect(res.body).not.to.be.empty;
             expect(res.body).to.deep.equal({ error: 'getaddrinfo ENOTFOUND github_exabple.com' });
 
