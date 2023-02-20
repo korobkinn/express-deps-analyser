@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "test": "mocha -r ts-node/register tests/**/*.test.ts",
-    "test:coverage": "nyc mocha -r ts-node/register tests/**/*.test.ts",
+    "test": "mocha --exit -r ts-node/register tests/**/*.test.ts",
+    "test:coverage": "nyc mocha --exit -r ts-node/register tests/**/*.test.ts",
     "test:watch": "nodemon --watch . --ext ts --exec \"mocha -r ts-node/register tests/**/*.test.ts\"",
     "lint": "eslint --cache --ext .ts .",
     "lint:fix": "eslint --cache --ext .ts . --fix",
