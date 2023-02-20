@@ -16,7 +16,7 @@ export async function analyzeFramework(req: Request, res: Response) {
         
         await fetchSourceCode(sourcetype, link, tempDir);
         
-        let parseResult = parse(tempDir);
+        const parseResult = parse(tempDir);
 
         const resBody = JSON.stringify(parseResult, null, 3);
         res.statusCode = 200;
