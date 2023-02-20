@@ -26,11 +26,13 @@ export async function analyzeFramework(req: Request, res: Response) {
         }
 
         const resBody = JSON.stringify(parseResult, null, 3);
+        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.send(resBody);
 
     } catch (err) {
         const resBody = JSON.stringify({ 'error': err.message }, null, 3);
+        res.statusCode = 500;
         res.setHeader('Content-Type', 'application/json');
         res.send(resBody);
         console.log('Error occured: ' + err);
