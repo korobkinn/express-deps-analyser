@@ -21,10 +21,6 @@
         "indent": [
             "error"
         ],
-        "linebreak-style": [
-            "error",
-            "windows"
-        ],
         "quotes": [
             "error",
             "single"
