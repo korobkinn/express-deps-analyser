@@ -18,8 +18,16 @@ export async function analyzeFramework(req: Request, res: Response) {
         
         const parseResult = parse(tempDir);
 
+        if (parseResult['error']){
+            res.statusCode = 501;
+        }
+        else if (parseResult['warning']){
+            res.statusCode = 412;
+        }
+        else{
+            res.statusCode = 200;
+        }        
         const resBody = JSON.stringify(parseResult, null, 3);
-        res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.send(resBody);
 
