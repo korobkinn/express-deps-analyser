@@ -19,14 +19,16 @@ export async function analyzeFramework(req: Request, res: Response) {
         const parseResult = extractProjectInformation(tempDir);
 
         res.statusCode = 200;
-        res.json(parseResult);
 
+        const error = { error: `Unable to analyze framework for ${link}` };
+        res.send(parseResult.projectInfo ?? error);
+        
     } catch (err) {
 
         console.error('Error occured: ', err);
         res.statusCode = 500;        
         res.json({ error: 'Server error' });        
-        
+
     } finally {
         fs.rmSync(tempDir, { force: true, recursive: true });
     }
