@@ -1,18 +1,17 @@
-import xcode from './xcode';
+import { XCode } from './xcode';
+import type { IParser, IParseResult } from '../../types/parser-types';
 
-export interface IParser {
-    parse(string);
-}
+const parsersArray: IParser[] = [new XCode()];
 
-const parsersArray : IParser[] = [ new xcode() ];
+export function extractProjectInformation(tempDir: string): IParseResult {
+    let result: IParseResult;
 
-export function parse(tempDir : string) : string {
-    let result : string;
     for (let i = 0; i < parsersArray.length; i++) {
         result = parsersArray[i].parse(tempDir);
-        if (!((result['error']) || (result['warning']))) {
-            break;
+        if (result.projectInfo !== undefined) {
+            return result;
         }
     }
-    return result;
+
+    return { error: `Unable to parse directory ${tempDir}` };
 }

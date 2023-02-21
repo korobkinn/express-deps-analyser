@@ -1,12 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import { IParser } from './parsers';
+import type { IParser, IParseResult } from '../../types/parser-types';
 
-export default class xCode implements IParser {
-    
-    parse(projectFolderPath: string) {
+export class XCode implements IParser {
+
+    parse(projectFolderPath: string): IParseResult {
         const EXTENSION = 'pbxproj';
-        const projFile = xCode.findFileByExt(projectFolderPath, EXTENSION);
+        const projFile = XCode.findFileByExt(projectFolderPath, EXTENSION);
+
 
         if (projFile.length > 0) {
             const fileContent = fs.readFileSync(projFile, 'utf8');
@@ -14,17 +15,16 @@ export default class xCode implements IParser {
 
             if (filematch) {
                 console.log('Found XCODE project file with compatibility information');
-                return { compatibilityVersion: filematch[2] };
-
+                return { projectInfo: { compatibilityVersion: filematch[2] } };
             }
             else {
                 console.log('Found XCODE project file, but without compatibility information');
-                return { warning: 'Found XCODE project file, but without compatibility information' };
+                return { error: 'Found XCODE project file, but without compatibility information' };
             }
         }
         else {
-            console.log('Noone supported framework detected');
-            return { error: 'Noone supported framework detected' };
+            console.log('No supported framework detected');
+            return { error: 'No supported framework detected' };
         }
     }
 
@@ -37,7 +37,7 @@ export default class xCode implements IParser {
             const newbase = path.join(base, files[i]);
 
             if (fs.statSync(newbase).isDirectory()) {
-                result = xCode.findFileByExt(newbase, ext);
+                result = XCode.findFileByExt(newbase, ext);
                 if (result.length > 0) {
                     break;
                 }
