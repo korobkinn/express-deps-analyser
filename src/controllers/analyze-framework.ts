@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { fetchFromZipURL } from './services/fetchers/zip-url';
-import { parse } from './services/parsers/parsers';
+import { fetchFromZipURL } from '../services/fetchers/zip-url';
+import { parse } from '../services/parsers/parsers';
 
 export async function analyzeFramework(req: Request, res: Response) {
     const tempDir = path.resolve(process.env.TEMPDIRPATH);

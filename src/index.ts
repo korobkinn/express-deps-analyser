@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { analyzeFramework } from './analyze-framework';
+import { analyzeFramework } from './controllers/analyze-framework';
 
 dotenv.config();
 export const app = express();
