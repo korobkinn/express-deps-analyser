@@ -1,8 +1,13 @@
-import express from 'express'
+import dotenv from 'dotenv';
+import express from 'express';
+import bodyParser from 'body-parser';
+import { analyzeFramework } from './controllers/analyze-framework';
 
-const app = express();
-const port = 5072;
-app.get('/', (request, response) => {
-    response.send('Hello world!');
-});
-app.listen(port, () => console.log(`Running on port ${port}`));
+dotenv.config();
+export const app = express();
+const port = process.env.PORT;
+
+app.use(bodyParser.json());
+
+app.post('/api/v1/analyze/framework', analyzeFramework);
+export const server = app.listen(port, () => console.log(`Running on port ${port}`));

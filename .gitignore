@@ -1,12 +1,15 @@
 #################  
+## VS
+#################
+.vs/
+.vscode/
+
+#################  
 ## npm
 #################
 npm-debug.log
 node_modules/
 dist/
-
-#################  
-## VS
-#################
-.vs/
-.vscode/
+tmp*/
+/.eslintcache
+.nyc_output/
